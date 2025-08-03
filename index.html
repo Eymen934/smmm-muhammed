@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMMM Muhammed Hanefi Günay | Mükellef Paneli</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    .menu {
+      background-color: #8a1538;
+      color: white;
+      width: 200px;
+      padding: 20px;
+      float: left;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .menu h1 {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      white-space: pre-line;
+    }
+    .menu button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: white;
+      color: #8a1538;
+      border: none;
+      cursor: pointer;
+    }
+    .main {
+      margin-left: 200px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .main h2 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    #details {
+      display: none;
+      background: #fff;
+      padding: 20px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+    }
+    #details h3 {
+      margin-top: 0;
+    }
+    input[type="text"] {
+      padding: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu">
+    <h1>SMMM
+Muhammed Hanefi Günay</h1>
+    <button onclick="showAddFirma()">+ Mükellef Ekle</button>
+    <button onclick="deleteSelected()">Seçili Firmayı Sil</button>
+  </div>
+
+  <div class="main">
+    <h2>Kayıtlı Firmalar</h2>
+    <table id="firmaTable">
+      <thead>
+        <tr><th>Firma Adı</th></tr>
+      </thead>
+      <tbody id="firmaBody"></tbody>
+    </table>
+    <div id="details"></div>
+  </div>
+
+  <script>
+    const fields = [
+      "Dijital V.D.", "SGK E-Bildirge Şifreleri", "İŞKUR Şifresi", "MERSİS Şifresi",
+      "E-Devlet Şifreleri", "E-Belediye Şifreleri", "Web Sitesi Panel", "Web Mail Panel",
+      "Toplu Sms", "XXX Banka Şifreleri"
+    ];
+
+    let firmalar = JSON.parse(localStorage.getItem("firmalar")) || {};
+
+    function saveData() {
+      localStorage.setItem("firmalar", JSON.stringify(firmalar));
+    }
+
+    function updateTable() {
+      const tbody = document.getElementById("firmaBody");
+      tbody.innerHTML = "";
+      for (let firma in firmalar) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td ondblclick="showDetails('${firma}')">${firma}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function showDetails(firma) {
+      const container = document.getElementById("details");
+      const info = firmalar[firma];
+      let html = `<h3>${firma} Bilgileri</h3>`;
+      for (let field of fields) {
+        const item = info[field] || {};
+        html += `<p><strong>${field} Kullanıcı Adı:</strong> ${item["Kullanıcı Adı"] || "-"}</p>`;
+        html += `<p><strong>${field} Şifre:</strong> ${item["Şifre"] || "-"}</p>`;
+      }
+      html += `<button onclick="document.getElementById('details').style.display='none'">Kapat</button>`;
+      container.innerHTML = html;
+      container.style.display = "block";
+    }
+
+    function deleteSelected() {
+      const firmaAdi = prompt("Silmek istediğiniz firma adını yazın:");
+      if (!firmaAdi || !firmalar[firmaAdi]) {
+        alert("Firma bulunamadı.");
+        return;
+      }
+      delete firmalar[firmaAdi];
+      saveData();
+      updateTable();
+    }
+
+    function showAddFirma() {
+      const firmaAdi = prompt("Firma Adı (zorunlu):");
+      if (!firmaAdi) return;
+
+      const yeniFirma = {};
+      for (let field of fields) {
+        const kullanici = prompt(field + " Kullanıcı Adı:") || "";
+        const sifre = prompt(field + " Şifre:") || "";
+        if (kullanici || sifre) {
+          yeniFirma[field] = {"Kullanıcı Adı": kullanici, "Şifre": sifre};
+        }
+      }
+
+      firmalar[firmaAdi] = yeniFirma;
+      saveData();
+      updateTable();
+    }
+
+    updateTable();
+  </script>
+</body>
+</html>
