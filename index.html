@@ -69,6 +69,20 @@
       width: 100%;
       box-sizing: border-box;
     }
+    .copy-btn {
+      margin-left: 5px;
+      padding: 2px 5px;
+      cursor: pointer;
+      font-size: 12px;
+      background-color: #8a1538;
+      color: white;
+      border: none;
+      border-radius: 3px;
+    }
+    .edit-input {
+      width: calc(100% - 60px);
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
@@ -119,12 +133,34 @@ Muhammed Hanefi Günay</h1>
       let html = `<h3>${firma} Bilgileri</h3>`;
       for (let field of fields) {
         const item = info[field] || {};
-        html += `<p><strong>${field} Kullanıcı Adı:</strong> ${item["Kullanıcı Adı"] || "-"}</p>`;
-        html += `<p><strong>${field} Şifre:</strong> ${item["Şifre"] || "-"}</p>`;
+        const kullanici = item["Kullanıcı Adı"] || "";
+        const sifre = item["Şifre"] || "";
+        html += `
+          <div>
+            <label><strong>${field} Kullanıcı Adı:</strong></label><br>
+            <input class="edit-input" type="text" value="${kullanici}" onchange="editField('${firma}','${field}','Kullanıcı Adı', this.value)" />
+            <button class="copy-btn" onclick="copyToClipboard('${kullanici}')">Kopyala</button>
+          </div>
+          <div>
+            <label><strong>${field} Şifre:</strong></label><br>
+            <input class="edit-input" type="text" value="${sifre}" onchange="editField('${firma}','${field}','Şifre', this.value)" />
+            <button class="copy-btn" onclick="copyToClipboard('${sifre}')">Kopyala</button>
+          </div>
+        `;
       }
-      html += `<button onclick="document.getElementById('details').style.display='none'">Kapat</button>`;
+      html += `<br><button onclick="document.getElementById('details').style.display='none'">Kapat</button>`;
       container.innerHTML = html;
       container.style.display = "block";
+    }
+
+    function editField(firma, field, key, value) {
+      if (!firmalar[firma][field]) firmalar[firma][field] = {};
+      firmalar[firma][field][key] = value;
+      saveData();
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => alert("Kopyalandı: " + text));
     }
 
     function deleteSelected() {
